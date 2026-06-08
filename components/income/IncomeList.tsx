@@ -11,17 +11,22 @@ interface IncomeListProps {
   income: Income[];
   onEdit: (item: Income) => void;
   onDelete: (id: string) => void;
+  hasFilters?: boolean;
 }
 
-export function IncomeList({ income, onEdit, onDelete }: IncomeListProps) {
+export function IncomeList({ income, onEdit, onDelete, hasFilters = false }: IncomeListProps) {
   const sortedIncome = useMemo(() => sortByLatest(income), [income]);
 
   if (sortedIncome.length === 0) {
     return (
       <EmptyState
         icon={TrendingUp}
-        title="No income recorded"
-        description="Track your earnings by adding your first income entry."
+        title={hasFilters ? "No matching income" : "No income recorded"}
+        description={
+          hasFilters
+            ? "Try changing the period or source filter."
+            : "Track your earnings by adding your first income entry."
+        }
       />
     );
   }

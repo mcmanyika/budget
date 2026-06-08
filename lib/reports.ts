@@ -15,6 +15,18 @@ export function getMonthlyExpenseTotal(expenses: Expense[], month: string): numb
     .reduce((sum, e) => sum + Number(e.amount), 0);
 }
 
+export function getWeeklyIncomeTotal(income: Income[], start: string, end: string): number {
+  return income
+    .filter((i) => isInRange(i.date, start, end))
+    .reduce((sum, i) => sum + Number(i.amount), 0);
+}
+
+export function getWeeklyExpenseTotal(expenses: Expense[], start: string, end: string): number {
+  return expenses
+    .filter((e) => isInRange(e.date, start, end))
+    .reduce((sum, e) => sum + Number(e.amount), 0);
+}
+
 export function getCategorySpending(expenses: Expense[], start: string, end: string): CategorySpending[] {
   const filtered = expenses.filter((e) => isInRange(e.date, start, end));
   return EXPENSE_CATEGORIES.map((category) => ({

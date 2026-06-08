@@ -8,18 +8,18 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { useIncome } from "@/hooks/useIncome";
 import { useExpenses } from "@/hooks/useExpenses";
-import { getCurrentMonth } from "@/lib/utils";
-import { getMonthlyIncomeTotal, getMonthlyExpenseTotal } from "@/lib/reports";
+import { getWeekRange, formatWeekRange } from "@/lib/utils";
+import { getWeeklyIncomeTotal, getWeeklyExpenseTotal } from "@/lib/reports";
 
 export default function DashboardPage() {
   const { income, loading: incomeLoading } = useIncome();
   const { expenses, loading: expensesLoading } = useExpenses();
 
   const loading = incomeLoading || expensesLoading;
-  const month = getCurrentMonth();
+  const { start, end } = getWeekRange();
 
-  const totalIncome = getMonthlyIncomeTotal(income, month);
-  const totalExpenses = getMonthlyExpenseTotal(expenses, month);
+  const totalIncome = getWeeklyIncomeTotal(income, start, end);
+  const totalExpenses = getWeeklyExpenseTotal(expenses, start, end);
   const remaining = totalIncome - totalExpenses;
 
   if (loading) return <PageLoader />;
@@ -28,7 +28,7 @@ export default function DashboardPage() {
     <>
       <MobileHeader
         title="Dashboard"
-        subtitle={new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        subtitle={`This week · ${formatWeekRange()}`}
         action={
           <Link
             href="/reports"
@@ -40,8 +40,8 @@ export default function DashboardPage() {
       />
       <div className="page-container space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <StatCard label="Income" value={totalIncome} icon={DollarSign} trend="positive" />
-          <StatCard label="Expenses" value={totalExpenses} icon={TrendingDown} trend="negative" />
+          <StatCard label="Income (This Week)" value={totalIncome} icon={DollarSign} trend="positive" />
+          <StatCard label="Expenses (This Week)" value={totalExpenses} icon={TrendingDown} trend="negative" />
         </div>
         <StatCard
           label="Remaining Balance"
@@ -50,7 +50,7 @@ export default function DashboardPage() {
           trend={remaining >= 0 ? "positive" : "negative"}
           className="col-span-2"
         />
-        <RecentTransactions income={income} expenses={expenses} />
+        <RecentTransactions income={income} expenses={expenses} start={start} end={end} />
       </div>
     </>
   );

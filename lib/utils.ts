@@ -36,10 +36,27 @@ export function getMonthRange(month: string) {
 }
 
 export function getWeekRange(date: Date = new Date()) {
+  const start = startOfWeek(date, { weekStartsOn: 1 });
+  const end = endOfWeek(date, { weekStartsOn: 1 });
   return {
-    start: startOfWeek(date, { weekStartsOn: 1 }).toISOString(),
-    end: endOfWeek(date, { weekStartsOn: 1 }).toISOString(),
+    start: format(start, "yyyy-MM-dd"),
+    end: format(end, "yyyy-MM-dd"),
   };
+}
+
+export function formatWeekRange(date: Date = new Date()): string {
+  const start = startOfWeek(date, { weekStartsOn: 1 });
+  const end = endOfWeek(date, { weekStartsOn: 1 });
+  const sameYear = start.getFullYear() === end.getFullYear();
+  const sameMonth = sameYear && start.getMonth() === end.getMonth();
+
+  if (sameMonth) {
+    return `${format(start, "MMM d")} – ${format(end, "d, yyyy")}`;
+  }
+  if (sameYear) {
+    return `${format(start, "MMM d")} – ${format(end, "MMM d, yyyy")}`;
+  }
+  return `${format(start, "MMM d, yyyy")} – ${format(end, "MMM d, yyyy")}`;
 }
 
 function parseDateOnly(dateStr: string): number {

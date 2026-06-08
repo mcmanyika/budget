@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Receipt } from "lucide-react";
-import { formatCurrency, formatShortDate } from "@/lib/utils";
+import { formatCurrency, formatShortDate, isInRange, sortByLatest } from "@/lib/utils";
 import type { Income, Expense } from "@/types";
 
 interface Transaction {
@@ -18,39 +17,50 @@ interface Transaction {
 interface RecentTransactionsProps {
   income: Income[];
   expenses: Expense[];
+  start?: string;
+  end?: string;
   limit?: number;
 }
 
-export function RecentTransactions({ income, expenses, limit = 5 }: RecentTransactionsProps) {
-  const transactions: Transaction[] = [
-    ...income.map((i) => ({
+export function RecentTransactions({ income, expenses, start, end, limit = 5 }: RecentTransactionsProps) {
+  const filterByRange = <T extends { date: string }>(records: T[]) => {
+    if (!start || !end) return records;
+    return records.filter((record) => isInRange(record.date, start, end));
+  };
+
+  const transactions: Transaction[] = sortByLatest([
+    ...filterByRange(income).map((i) => ({
       id: i.id,
       type: "income" as const,
       label: i.source,
       amount: i.amount,
       date: i.date,
+      createdAt: i.createdAt,
     })),
-    ...expenses.map((e) => ({
+    ...filterByRange(expenses).map((e) => ({
       id: e.id,
       type: "expense" as const,
       label: e.category,
       amount: e.amount,
       date: e.date,
+      createdAt: e.createdAt,
     })),
-  ]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, limit);
+  ]).slice(0, limit);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Transactions</CardTitle>
+        <CardTitle>{start && end ? "This Week's Transactions" : "Recent Transactions"}</CardTitle>
       </CardHeader>
       {transactions.length === 0 ? (
         <EmptyState
           icon={Receipt}
-          title="No transactions yet"
-          description="Add income or expenses to see them here."
+          title={start && end ? "No transactions this week" : "No transactions yet"}
+          description={
+            start && end
+              ? "Add income or expenses for this week to see them here."
+              : "Add income or expenses to see them here."
+          }
         />
       ) : (
         <div className="space-y-3">
