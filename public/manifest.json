@@ -1,0 +1,10 @@
+{
+  "name": "Family Budget",
+  "short_name": "Budget",
+  "description": "Track income, expenses, budgets, and savings goals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait"
+}
