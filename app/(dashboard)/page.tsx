@@ -5,29 +5,22 @@ import { DollarSign, TrendingDown, Wallet, BarChart3 } from "lucide-react";
 import { MobileHeader } from "@/components/layout/MobileHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { ExpenseChart } from "@/components/dashboard/ExpenseChart";
-import { SavingsProgress } from "@/components/dashboard/SavingsProgress";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { useIncome } from "@/hooks/useIncome";
 import { useExpenses } from "@/hooks/useExpenses";
-import { useGoals } from "@/hooks/useGoals";
 import { getCurrentMonth } from "@/lib/utils";
-import { getMonthlyIncomeTotal, getMonthlyExpenseTotal, getCategorySpending } from "@/lib/reports";
-import { getMonthRange } from "@/lib/utils";
+import { getMonthlyIncomeTotal, getMonthlyExpenseTotal } from "@/lib/reports";
 
 export default function DashboardPage() {
   const { income, loading: incomeLoading } = useIncome();
   const { expenses, loading: expensesLoading } = useExpenses();
-  const { goals, loading: goalsLoading } = useGoals();
 
-  const loading = incomeLoading || expensesLoading || goalsLoading;
+  const loading = incomeLoading || expensesLoading;
   const month = getCurrentMonth();
-  const { start, end } = getMonthRange(month);
 
   const totalIncome = getMonthlyIncomeTotal(income, month);
   const totalExpenses = getMonthlyExpenseTotal(expenses, month);
   const remaining = totalIncome - totalExpenses;
-  const categoryData = getCategorySpending(expenses, start, end);
 
   if (loading) return <PageLoader />;
 
@@ -57,8 +50,6 @@ export default function DashboardPage() {
           trend={remaining >= 0 ? "positive" : "negative"}
           className="col-span-2"
         />
-        <SavingsProgress goals={goals} />
-        <ExpenseChart data={categoryData} />
         <RecentTransactions income={income} expenses={expenses} />
       </div>
     </>

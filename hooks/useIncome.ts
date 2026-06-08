@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import type { Income } from "@/types";
 import * as firestore from "@/lib/firestore";
+import { sortByLatest } from "@/lib/utils";
 import { useAuth } from "./useAuth";
 import { useDataFetch } from "./useDataFetch";
 
@@ -24,10 +25,10 @@ export function useIncome() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    setIncome((prev) => [optimistic, ...prev]);
+    setIncome((prev) => sortByLatest([optimistic, ...prev]));
     try {
       const id = await firestore.createIncome(user.uid, data);
-      setIncome((prev) => prev.map((item) => (item.id === optimistic.id ? { ...item, id } : item)));
+      setIncome((prev) => sortByLatest(prev.map((item) => (item.id === optimistic.id ? { ...item, id } : item))));
       toast.success("Income added");
     } catch {
       setIncome((prev) => prev.filter((item) => item.id !== optimistic.id));
@@ -38,8 +39,10 @@ export function useIncome() {
   const editIncome = async (id: string, data: Partial<Income>) => {
     const previous = income;
     setIncome((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, ...data, updatedAt: new Date().toISOString() } : item
+      sortByLatest(
+        prev.map((item) =>
+          item.id === id ? { ...item, ...data, updatedAt: new Date().toISOString() } : item
+        )
       )
     );
     try {

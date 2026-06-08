@@ -11,6 +11,7 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import { getClientDb } from "./firebase";
+import { sortByLatest } from "./utils";
 import type { Income, Expense, Budget, SavingsGoal } from "@/types";
 
 function mapDoc<T extends { id: string }>(docData: DocumentData, id: string): T {
@@ -34,7 +35,7 @@ function sortByField<T>(records: T[], field: string, direction: "asc" | "desc" =
   });
 }
 
-async function getUserRecords<T extends { id: string }>(
+async function getUserRecords<T extends { id: string; date?: string; createdAt?: string }>(
   collectionName: string,
   userId: string,
   orderField = "date"
@@ -45,7 +46,7 @@ async function getUserRecords<T extends { id: string }>(
   );
   const snapshot = await getDocs(q);
   const records = snapshot.docs.map((d) => mapDoc<T>(d.data(), d.id));
-  return sortByField(records, orderField, "desc");
+  return orderField === "date" ? sortByLatest(records) : sortByField(records, orderField, "desc");
 }
 
 export async function getIncome(userId: string) {

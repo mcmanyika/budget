@@ -1,9 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import { Pencil, Trash2, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, sortByLatest } from "@/lib/utils";
 import type { Income } from "@/types";
 
 interface IncomeListProps {
@@ -13,7 +14,9 @@ interface IncomeListProps {
 }
 
 export function IncomeList({ income, onEdit, onDelete }: IncomeListProps) {
-  if (income.length === 0) {
+  const sortedIncome = useMemo(() => sortByLatest(income), [income]);
+
+  if (sortedIncome.length === 0) {
     return (
       <EmptyState
         icon={TrendingUp}
@@ -25,7 +28,7 @@ export function IncomeList({ income, onEdit, onDelete }: IncomeListProps) {
 
   return (
     <div className="space-y-3">
-      {income.map((item) => (
+      {sortedIncome.map((item) => (
         <Card key={item.id} className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-slate-900 dark:text-slate-100">{item.source}</p>
@@ -36,16 +39,20 @@ export function IncomeList({ income, onEdit, onDelete }: IncomeListProps) {
             <span className="text-lg font-bold text-emerald-600">{formatCurrency(item.amount)}</span>
             <div className="flex gap-1">
               <button
+                type="button"
                 onClick={() => onEdit(item)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800"
+                aria-label="Edit income"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-4 w-4" strokeWidth={2} />
               </button>
               <button
+                type="button"
                 onClick={() => onDelete(item.id)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-900/20"
+                aria-label="Delete income"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4" strokeWidth={2} />
               </button>
             </div>
           </div>

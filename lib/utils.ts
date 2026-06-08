@@ -30,8 +30,8 @@ export function getCurrentMonth(): string {
 export function getMonthRange(month: string) {
   const date = parseISO(`${month}-01`);
   return {
-    start: startOfMonth(date).toISOString(),
-    end: endOfMonth(date).toISOString(),
+    start: format(startOfMonth(date), "yyyy-MM-dd"),
+    end: format(endOfMonth(date), "yyyy-MM-dd"),
   };
 }
 
@@ -42,9 +42,36 @@ export function getWeekRange(date: Date = new Date()) {
   };
 }
 
+function parseDateOnly(dateStr: string): number {
+  const dateOnly = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+  const time = parseISO(dateOnly).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+export function isInMonth(dateStr: string, month: string): boolean {
+  const dateOnly = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+  return dateOnly.startsWith(month);
+}
+
 export function isInRange(dateStr: string, start: string, end: string): boolean {
-  const date = parseISO(dateStr).getTime();
-  return date >= parseISO(start).getTime() && date <= parseISO(end).getTime();
+  const date = parseDateOnly(dateStr);
+  const startTime = parseDateOnly(start);
+  const endTime = parseDateOnly(end);
+  return date >= startTime && date <= endTime;
+}
+
+function toTimestamp(value?: string): number {
+  if (!value) return 0;
+  const time = parseISO(value).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+export function sortByLatest<T extends { date?: string; createdAt?: string }>(records: T[]): T[] {
+  return [...records].sort((a, b) => {
+    const dateDiff = toTimestamp(b.date) - toTimestamp(a.date);
+    if (dateDiff !== 0) return dateDiff;
+    return toTimestamp(b.createdAt) - toTimestamp(a.createdAt);
+  });
 }
 
 export function getBudgetStatus(spent: number, budget: number): {

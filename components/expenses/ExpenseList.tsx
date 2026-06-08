@@ -40,9 +40,9 @@ export function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
             <div className="flex gap-1">
               <button
                 onClick={() => onEdit(item)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className="h-4 w-4 text-slate-600 dark:text-slate-300" strokeWidth={2} />
               </button>
               <button
                 onClick={() => onDelete(item.id)}

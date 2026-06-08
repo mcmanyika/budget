@@ -30,6 +30,24 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+input,
+select,
+textarea {
+  color: #0f172a;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  color: #f1f5f9;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
 .safe-bottom {
   padding-bottom: max(0.5rem, var(--safe-bottom));
 }

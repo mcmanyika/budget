@@ -1,12 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { positiveAmount } from "@/lib/validation";
+import { INCOME_SOURCES } from "@/lib/constants";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import type { Income } from "@/types";
 
@@ -27,6 +30,14 @@ interface IncomeFormProps {
 }
 
 export function IncomeForm({ initial, onSubmit, onCancel }: IncomeFormProps) {
+  const sourceOptions = useMemo(() => {
+    const sources: string[] = [...INCOME_SOURCES];
+    if (initial?.source && !sources.includes(initial.source)) {
+      sources.unshift(initial.source);
+    }
+    return sources.map((s) => ({ value: s, label: s }));
+  }, [initial?.source]);
+
   const {
     register,
     handleSubmit,
@@ -34,8 +45,8 @@ export function IncomeForm({ initial, onSubmit, onCancel }: IncomeFormProps) {
   } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: {
-      amount: initial?.amount ?? 0,
-      source: initial?.source ?? "",
+      amount: initial?.amount ?? ("" as unknown as number),
+      source: initial?.source ?? "Salary",
       date: initial?.date ?? format(new Date(), "yyyy-MM-dd"),
       notes: initial?.notes ?? "",
     },
@@ -51,9 +62,9 @@ export function IncomeForm({ initial, onSubmit, onCancel }: IncomeFormProps) {
         error={errors.amount?.message}
         {...register("amount")}
       />
-      <Input
+      <Select
         label="Source"
-        placeholder="Salary, Freelance, etc."
+        options={sourceOptions}
         error={errors.source?.message}
         {...register("source")}
       />

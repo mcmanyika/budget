@@ -12,6 +12,20 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Miscellaneous: "#94a3b8",
 };
 
+export const INCOME_SOURCES = [
+  "Salary",
+  "Freelance",
+  "Lyft",
+  "Business",
+  "Side Hustle",
+  "Investments",
+  "Rental Income",
+  "Gifts",
+  "Refunds",
+  "Benefits",
+  "Other",
+] as const;
+
 export const NAV_ITEMS = [
   { href: "/", label: "Home", icon: "Home" },
   { href: "/income", label: "Income", icon: "TrendingUp" },
